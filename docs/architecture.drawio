@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="eks-platform-gitops">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="vpc" value="VPC (10.0.0.0/16, 3 AZs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="900" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="eks" value="Amazon EKS 1.30 Control Plane" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;" vertex="1" parent="1">
+          <mxGeometry x="130" y="140" width="800" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="sysng" value="Managed Node Group\n(system, tainted)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="300" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="karpenter_nodes" value="Karpenter NodePools\n(general-purpose: spot+od)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="300" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="argocd" value="ArgoCD (app-of-apps)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;" vertex="1" parent="1">
+          <mxGeometry x="690" y="300" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="app" value="eks-demo-app\n(FastAPI, HPA, ServiceMonitor)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="420" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mon" value="kube-prometheus-stack\n+ Loki/Promtail" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="420" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="alb" value="Application Load Balancer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;" vertex="1" parent="1">
+          <mxGeometry x="690" y="420" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="private_subnets" value="Private Subnets (nodes)" style="dashed=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="540" width="500" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="public_subnets" value="Public Subnets (ALB, NAT GW)" style="dashed=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="540" width="270" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

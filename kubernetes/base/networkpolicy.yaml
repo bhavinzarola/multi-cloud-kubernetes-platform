@@ -1,0 +1,60 @@
+# Default-deny all ingress and egress in the namespace, then explicitly allow
+# what's required: traffic from the ALB (via the ingress controller's node
+# ports/target group), traffic from the monitoring namespace (Prometheus
+# scraping /metrics), and egress to DNS + the internet (via NAT) for the app.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: eks-demo-app
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-alb-and-monitoring
+  namespace: eks-demo-app
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: eks-demo-app
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from: [] # ALB target group traffic arrives via the node's kube-proxy/ENI path,
+               # not a namespaced pod selector; scope further with a CNI-level policy
+               # (e.g. Calico) if stricter isolation from the ALB path is required.
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-and-egress
+  namespace: eks-demo-app
+spec:
+  podSelector: {}
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443

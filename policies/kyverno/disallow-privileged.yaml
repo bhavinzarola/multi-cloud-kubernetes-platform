@@ -1,0 +1,41 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Blocks privileged containers and privilege escalation, matching the
+      "restricted" Pod Security Standard enforced at the namespace level.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: privileged-containers
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+      validate:
+        message: "Privileged containers and privilege escalation are not allowed."
+        pattern:
+          spec:
+            =(securityContext):
+              =(allowPrivilegeEscalation): "false"
+            containers:
+              - =(securityContext):
+                  =(privileged): "false"
+                  =(allowPrivilegeEscalation): "false"
+    - name: require-labels
+      match:
+        any:
+          - resources:
+              kinds: ["Pod", "Deployment"]
+      validate:
+        message: "Resources must have 'app.kubernetes.io/name' and 'app.kubernetes.io/part-of' labels."
+        pattern:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "?*"

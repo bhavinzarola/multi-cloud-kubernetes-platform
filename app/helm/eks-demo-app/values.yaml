@@ -1,0 +1,77 @@
+replicaCount: 2
+
+image:
+  repository: REPLACE_WITH_ECR_REPO_URL
+  tag: latest
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: eks-demo-app
+  irsaRoleArn: "" # placeholder, set per environment if the app needs AWS API access
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  fsGroup: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  host: eks-demo-app.dev.example.com
+  path: /
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readiness:
+    path: /ready
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+serviceMonitor:
+  enabled: true
+  interval: 15s
+  path: /metrics
+
+config:
+  APP_ENVIRONMENT: "dev"
+  APP_LOG_LEVEL: "INFO"
+  APP_FEATURE_NEW_ITEMS_ENDPOINT: "true"
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1

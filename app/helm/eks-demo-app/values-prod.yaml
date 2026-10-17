@@ -1,0 +1,34 @@
+replicaCount: 3
+
+image:
+  tag: prod
+
+ingress:
+  host: eks-demo-app.example.com
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/certificate-arn: "REPLACE_WITH_ACM_CERT_ARN"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+
+hpa:
+  minReplicas: 3
+  maxReplicas: 10
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+config:
+  APP_ENVIRONMENT: "prod"
+  APP_LOG_LEVEL: "INFO"
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2

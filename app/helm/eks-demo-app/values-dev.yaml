@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  tag: dev
+
+ingress:
+  host: eks-demo-app.dev.example.com
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 3
+
+config:
+  APP_ENVIRONMENT: "dev"
+  APP_LOG_LEVEL: "DEBUG"
+
+podDisruptionBudget:
+  enabled: false
